@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P2S Combo – 3D Printer</title>
+<link rel="icon" type="image/x-icon" href="https://i.postimg.cc/mhx8fXTv/Chat-GPT-Image-Dec-2-2025-04-09-29-PM.png">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&display=swap" rel="stylesheet">
+
+<style>
+/* GLOBAL */
+body {
+    margin: 0;
+    font-family: "Manrope", sans-serif;
+    background: radial-gradient(circle at top, #0f1a12, #050505 60%);
+    color: #e5e5e5;
+    overflow-x: hidden;
+}
+
+/* NEON GRID BACKGROUND */
+.background-grid {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(rgba(0,255,120,0.05) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(0,255,120,0.05) 2px, transparent 2px);
+    background-size: 60px 60px;
+    z-index: -2;
+    opacity: 0.25;
+}
+
+/* PARTICLES */
+.particle {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: #39ff8d;
+    border-radius: 50%;
+    filter: blur(3px);
+    animation: rise 8s linear infinite;
+    opacity: 0.7;
+}
+@keyframes rise {
+    0% { transform: translateY(120vh) translateX(0); opacity: 0; }
+    20% { opacity: 0.8; }
+    100% { transform: translateY(-20vh) translateX(20px); opacity: 0; }
+}
+
+/* PAGE WRAPPER */
+.wrapper {
+    max-width: 1200px;
+    margin: auto;
+    padding: 80px 20px;
+}
+
+/* TITLE */
+h1 {
+    font-size: 3rem;
+    text-align: center;
+    color: #39ff8d;
+    text-shadow: 0 0 20px rgba(57,255,141,0.7);
+    margin-bottom: 50px;
+}
+
+/* SECTION BLOCKS */
+.block {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 100px;
+    padding: 40px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 20px;
+    border: 1px solid rgba(57,255,141,0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 25px rgba(0,255,120,0.07);
+}
+.block img, .block video {
+    width: 48%;
+    border-radius: 20px;
+    box-shadow: 0 0 25px rgba(0,255,120,0.2);
+}
+.block .text {
+    width: 52%;
+}
+.block h2 {
+    font-size: 2.2rem;
+    color: #39ff8d;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(57,255,141,0.6);
+}
+.block ul {
+    line-height: 1.8;
+    font-size: 1.2rem;
+}
+
+/* ALTERNATE SECTIONS */
+.block.reverse {
+    flex-direction: row-reverse;
+}
+
+/* BACK BUTTON */
+a.back {
+    display: inline-block;
+    margin-bottom: 40px;
+    padding: 12px 20px;
+    background: #39ff8d;
+    color: #000;
+    border-radius: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.3s;
+}
+a.back:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 0 15px #39ff8d;
+}
+</style>
+</head>
+<body>
+<div class="background-grid"></div>
+
+<script>
+function spawnParticle() {
+    const p = document.createElement("div");
+    p.classList.add("particle");
+    p.style.left = Math.random() * 100 + "vw";
+    p.style.animationDuration = (6 + Math.random() * 4) + "s";
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 10000);
+}
+setInterval(spawnParticle, 300);
+</script>
+
+<div class="wrapper">
+<a class="back" href="index.html">⬅ Povratak</a>
+<h1>P2S Combo – Profesionalni 3D Printer</h1>
+
+<!-- BLOK 1 -->
+<div class="block">
+    <div class="text">
+        <h2>Napredni profesionalni 3D printer</h2>
+        <ul>
+            <li>Printanje složenih modela i funkcionalnih dijelova</li>
+            <li>Stabilan rad i izuzetna preciznost</li>
+            <li>Veliki radni volumen za veće projekte</li>
+            <li>Automatska kalibracija i napredni senzori</li>
+            <li>Softver optimiziran za profesionalnu upotrebu</li>
+        </ul>
+    </div>
+    <img src="https://blog.bambulab.com/content/images/2025/10/P2S--3-.jpg" alt="P2S Combo Printer">
+</div>
+
+<!-- BLOK 2 (REVERSE) -->
+<div class="block reverse">
+    <img src="https://store.bblcdn.com/s7/default/74733e90c3fc43ed9cfad92ff5301c5a/MO.jpg__op__resize,m_lfit,w_3840__op__format,f_auto__op__quality,q_80" alt="Printer Filament">
+    <div class="text">
+        <h2>Kompatibilnost filamenta</h2>
+        <ul>
+            <li>Potpuno kompatibilan s PLA i PETG</li>
+            <li>Idealno za prototipe i precizne funkcionalne dijelove</li>
+            <li>Visoka stabilnost ispisa i čisto topljenje</li>
+        </ul>
+    </div>
+</div>
+
+<!-- BLOK 3 (VIDEO) -->
+<div class="block">
+    <div class="text">
+        <h2>Video demonstracija</h2>
+        <p>Pogledajte kako P2S Combo radi u stvarnom okruženju, prikazuje brzinu, preciznost i automatizirane funkcije.</p>
+    </div>
+    <video controls>
+        <source src="https://cdn1.bambulab.com/p2s/0zzhnrks5h7i/TVC/tvc.mp4" type="video/mp4">
+    </video>
+</div>
+
+</div>
+
+</body>
+</html>
