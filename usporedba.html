@@ -75,8 +75,9 @@ h1 {
 /* SECTION BLOCKS */
 .block {
     display: flex;
+    flex-direction: column; /* vertikalno */
     align-items: center;
-    gap: 40px;
+    gap: 20px; /* prostor između teksta i slike/video */
     margin-bottom: 100px;
     padding: 40px;
     background: rgba(255,255,255,0.04);
@@ -86,12 +87,14 @@ h1 {
     box-shadow: 0 0 25px rgba(0,255,120,0.07);
 }
 .block img, .block iframe {
-    width: 48%;
+    width: 100%;
+    max-width: 600px;
     border-radius: 20px;
     box-shadow: 0 0 25px rgba(0,255,120,0.2);
 }
 .block .text {
-    width: 52%;
+    width: 100%;
+    text-align: center; /* centriramo tekst */
 }
 .block h2 {
     font-size: 2.2rem;
@@ -102,9 +105,8 @@ h1 {
 .block ul {
     line-height: 1.8;
     font-size: 1.2rem;
-}
-.block.reverse {
-    flex-direction: row-reverse;
+    padding-left: 0;
+    list-style-position: inside;
 }
 
 /* BACK BUTTON */
@@ -122,12 +124,6 @@ a.back {
 a.back:hover {
     filter: brightness(1.2);
     box-shadow: 0 0 15px #39ff8d;
-}
-
-/* RESPONSIVE */
-@media (max-width:900px) {
-    .block { flex-direction: column; text-align: center; }
-    .block img, .block iframe { width: 80%; margin-bottom: 20px; }
 }
 </style>
 </head>
@@ -166,12 +162,12 @@ setInterval(spawnParticle, 300);
 </div>
 
 <!-- BLOK 2 - VIDEO -->
-<div class="block reverse">
+<div class="block">
     <div class="text">
         <h2>Video usporedba</h2>
         <p>Pogledajte vizualnu demonstraciju razlike PLA i PETG filamenta, njihovih svojstava i primjene.</p>
     </div>
-    <iframe src="https://www.youtube.com/watch?v=3aJSvasP0Vc" frameborder="0" allowfullscreen></iframe>
+    <iframe src="https://www.youtube.com/embed/3aJSvasP0Vc" frameborder="0" allowfullscreen></iframe>
 </div>
 
 </div>
