@@ -64,8 +64,9 @@ h1 {
 /* SECTION BLOCKS */
 .block {
     display: flex;
+    flex-direction: column; /* stavili smo da bude vertikalno */
     align-items: center;
-    gap: 40px;
+    gap: 20px; /* smanjen razmak između teksta i medija */
     margin-bottom: 100px;
     padding: 40px;
     background: rgba(255,255,255,0.04);
@@ -75,12 +76,14 @@ h1 {
     box-shadow: 0 0 25px rgba(0,255,120,0.07);
 }
 .block img, .block video {
-    width: 48%;
+    width: 100%; /* sada slike i video idu full width */
+    max-width: 600px;
     border-radius: 20px;
     box-shadow: 0 0 25px rgba(0,255,120,0.2);
 }
 .block .text {
-    width: 52%;
+    width: 100%;
+    text-align: center; /* centriramo tekst */
 }
 .block h2 {
     font-size: 2.2rem;
@@ -91,11 +94,8 @@ h1 {
 .block ul {
     line-height: 1.8;
     font-size: 1.2rem;
-}
-
-/* ALTERNATE SECTIONS */
-.block.reverse {
-    flex-direction: row-reverse;
+    padding-left: 0;
+    list-style-position: inside;
 }
 
 /* BACK BUTTON */
@@ -150,9 +150,8 @@ setInterval(spawnParticle, 300);
     <img src="https://blog.bambulab.com/content/images/2025/10/P2S--3-.jpg" alt="P2S Combo Printer">
 </div>
 
-<!-- BLOK 2 (REVERSE) -->
-<div class="block reverse">
-    <img src="https://store.bblcdn.com/s7/default/74733e90c3fc43ed9cfad92ff5301c5a/MO.jpg__op__resize,m_lfit,w_3840__op__format,f_auto__op__quality,q_80" alt="Printer Filament">
+<!-- BLOK 2 -->
+<div class="block">
     <div class="text">
         <h2>Kompatibilnost filamenta</h2>
         <ul>
@@ -161,6 +160,7 @@ setInterval(spawnParticle, 300);
             <li>Visoka stabilnost ispisa i čisto topljenje</li>
         </ul>
     </div>
+    <img src="https://store.bblcdn.com/s7/default/74733e90c3fc43ed9cfad92ff5301c5a/MO.jpg__op__resize,m_lfit,w_3840__op__format,f_auto__op__quality,q_80" alt="Printer Filament">
 </div>
 
 <!-- BLOK 3 (VIDEO) -->
