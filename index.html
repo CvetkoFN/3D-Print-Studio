@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>3D Print Studio</title>
+<link rel="icon" type="image/x-icon" href="https://i.postimg.cc/mhx8fXTv/Chat-GPT-Image-Dec-2-2025-04-09-29-PM.png">
+
+<!-- MANROPE FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&display=swap" rel="stylesheet">
+
+<style>
+/* ========== GLOBAL ========== */
+:root{
+  --bg:#060607;
+  --panel:#0b0b0b;
+  --accent:#39ff8d;
+  --muted:#bfcfc2;
+  --glass-alpha:0.18;
+  --glow: 0 0 18px rgba(57,255,141,0.18);
+  --neon: linear-gradient(90deg, rgba(57,255,141,0.06), rgba(0,255,160,0.12));
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(57,255,141,0.02), transparent 5%),
+              radial-gradient(900px 400px at 90% 90%, rgba(0,255,160,0.02), transparent 5%),
+              var(--bg);
+  color:#e9efe8;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  transition:background 0.4s, color 0.4s;
+  overflow-x:hidden;
+}
+
+/* GLOW BORDER ANIMATION (around whole page) */
+.page-border {
+  pointer-events:none;
+  position:fixed;
+  inset:0;
+  z-index:2000;
+  background:
+    radial-gradient(600px 200px at 10% 10%, rgba(57,255,141,0.06), transparent 10%),
+    radial-gradient(600px 200px at 90% 90%, rgba(0,255,160,0.04), transparent 10%);
+  mix-blend-mode:screen;
+}
+.page-frame {
+  position:fixed;
+  inset:8px;
+  border-radius:14px;
+  padding:2px;
+  pointer-events:none;
+  background: linear-gradient(90deg, rgba(57,255,141,0.12), rgba(0,200,120,0.05));
+  filter: blur(10px);
+  z-index:2001;
+}
+
+/* ========== HEADER / LOGO ========== */
+header{
+  padding:48px 20px 36px;
+  text-align:center;
+  position:relative;
+  z-index:50;
+}
+#logo{width:120px;margin-bottom:12px;filter:drop-shadow(0 6px 18px rgba(0,255,140,0.15));}
+
+/* ========== NAVBAR (premium) ========== */
+.nav-super{
+  position:sticky;
+  top:14px; /* slight gap for floating look */
+  z-index:1200;
+  display:flex;
+  justify-content:center;
+  padding:12px 18px;
+  margin:0 18px;
+  border-radius:999px;
+  backdrop-filter: blur(10px) saturate(1.1);
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  box-shadow: 0 6px 30px rgba(0,0,0,0.6);
+  border: 1px solid rgba(57,255,141,0.07);
+  transition: all 300ms ease;
+  transform-origin: center;
+}
+.nav-super.shrink{
+  transform: translateY(-6px) scale(0.985);
+  padding:8px 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.75), 0 0 30px rgba(57,255,141,0.04);
+}
+
+/* inner layout */
+.nav-inner{
+  display:flex;
+  align-items:center;
+  gap:36px;
+  position:relative;
+}
+
+/* brand area left */
+.nav-brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-right:18px;
+  padding-right:16px;
+  border-right: 1px solid rgba(255,255,255,0.02);
+}
+.nav-brand img{width:44px; border-radius:10px; filter:drop-shadow(0 6px 20px rgba(0,255,120,0.08));}
+.nav-brand .name{font-weight:800; font-size:1.05rem; letter-spacing:0.6px; color:var(--accent);}
+
+/* links */
+.nav-super a{
+  position:relative;
+  text-decoration:none;
+  color:rgba(230,238,230,0.95);
+  font-weight:700;
+  padding:8px 6px;
+  font-size:1rem;
+  transition: all 220ms cubic-bezier(.2,.9,.2,1);
+  border-radius:6px;
+  display:inline-block;
+}
+
+/* magnet hover: element subtly pulls to cursor */
+.nav-super a.magnet{
+  will-change:transform;
+}
+
+/* active hover */
+.nav-super a:hover{
+  color:var(--accent);
+  transform: translateY(-3px) scale(1.02);
+  text-shadow: 0 0 12px rgba(57,255,141,0.45);
+}
+
+/* underline bar */
+.nav-underline{
+  position:absolute;
+  bottom:6px;
+  height:3px;
+  width:0;
+  left:0;
+  border-radius:999px;
+  background: linear-gradient(90deg, rgba(57,255,141,0.9), rgba(0,255,160,0.8));
+  box-shadow: 0 0 18px rgba(57,255,141,0.35);
+  transition: width 260ms ease, left 260ms ease;
+  pointer-events:none;
+}
+
+/* neon tiny accent lines */
+.nav-accent{
+  position:absolute;
+  inset:auto 10px 10px auto;
+  height:6px;
+  width:6px;
+  border-radius:50%;
+  background:rgba(57,255,141,0.75);
+  filter:blur(6px);
+  transform:translateX(10px);
+}
+
+/* ========== NEON GRID BACKGROUND ========== */
+.neon-grid{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background-image:
+    linear-gradient(transparent 95%, rgba(57,255,141,0.02) 95%),
+    linear-gradient(90deg, transparent 95%, rgba(0,255,160,0.02) 95%);
+  background-size: 120px 120px, 120px 120px;
+  mix-blend-mode:overlay;
+  opacity:0.6;
+  transform: translateZ(0);
+  filter: blur(8px) contrast(1.05) saturate(1.05);
+}
+
+/* animated subtle grid movement */
+@keyframes gridShift {
+  0%{ transform: translate3d(0,0,0) }
+  50%{ transform: translate3d(20px, -12px, 0) }
+  100%{ transform: translate3d(0,0,0) }
+}
+.neon-grid{ animation: gridShift 14s linear infinite; }
+
+/* ========== HERO (parallax + 3D glow) ========== */
+.hero{
+  position:relative;
+  height:520px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding: 30px 20px;
+  z-index:2;
+  overflow:hidden;
+}
+.hero .bg-layer{
+  position:absolute;
+  inset:0;
+  background-image: url('https://cdn.pixabay.com/photo/2016/11/29/09/32/3d-printing-1869384_1280.jpg');
+  background-size:cover;
+  background-position:center;
+  filter: contrast(1.02) saturate(1.05) blur(0.6px);
+  transform-origin:center;
+  will-change:transform;
+  transition: transform 0.06s linear;
+  opacity:0.95;
+}
+.hero .overlay{
+  position:absolute; inset:0;
+  background: linear-gradient(180deg, rgba(3,6,5,0.25), rgba(3,6,5,0.45));
+  mix-blend-mode:multiply;
+}
+.hero h2{
+  position:relative;
+  z-index:4;
+  font-size: clamp(1.8rem, 3.2vw, 3.6rem);
+  margin:0;
+  font-weight:800;
+  letter-spacing:1px;
+  color:#e9efe8;
+  text-shadow:0 12px 40px rgba(0,0,0,0.7), 0 0 22px rgba(57,255,141,0.06);
+}
+.hero .cta{
+  margin-top:16px;
+  display:inline-block;
+  z-index:4;
+  background: linear-gradient(90deg, rgba(57,255,141,0.12), rgba(0,255,160,0.08));
+  padding:10px 18px;
+  border-radius:10px;
+  border: 1px solid rgba(57,255,141,0.12);
+  color:var(--accent);
+  font-weight:700;
+  backdrop-filter: blur(6px);
+  cursor:pointer;
+  transition: transform 180ms ease;
+}
+.hero .cta:hover{ transform: translateY(-4px) }
+
+/* subtle floating particles in hero */
+.hero .particle{
+  position:absolute;
+  width:10px; height:10px;
+  border-radius:50%;
+  background: radial-gradient(circle, rgba(57,255,141,0.9), rgba(0,255,160,0.3));
+  filter: blur(2px);
+  opacity:0.7;
+  will-change:transform,opacity;
+}
+
+/* ========== CONTENT SECTIONS ========== */
+.section{
+  padding:70px 20px;
+  max-width:1200px;
+  margin: auto;
+  position:relative;
+  z-index:2;
+}
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:12px;
+  padding:18px;
+  margin-bottom:18px;
+  border:1px solid rgba(57,255,141,0.04);
+  box-shadow: 0 8px 40px rgba(2,5,4,0.5);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+.card.tilt{
+  transform-style:preserve-3d;
+  will-change:transform;
+}
+.card:hover{ transform: translateY(-8px) }
+
+/* headings */
+h2 {
+  color:var(--accent);
+  font-size:1.8rem;
+  margin-bottom:18px;
+  border-left:5px solid rgba(57,255,141,0.22);
+  padding-left:14px;
+}
+
+/* list style */
+ul{ margin-left:18px; line-height:1.8; color: #dbeeda; }
+li{ margin-bottom:8px; }
+
+/* ========== MAGNETIC HOVER ON LINKS (JS) ========= */
+
+/* ========== PARTICLES (canvas) ========= */
+#particle-canvas{
+  position:fixed;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  opacity:0.85;
+}
+
+/* ========== SCROLL-REVEAL (initially hidden) ========== */
+.reveal{
+  opacity:0;
+  transform: translateY(18px) scale(0.995);
+  transition: all 700ms cubic-bezier(.12,.7,.24,1);
+  will-change:transform,opacity;
+}
+.reveal.show{
+  opacity:1;
+  transform: translateY(0) scale(1);
+}
+
+/* ========== FOOTER (redesign) ========== */
+footer{
+  padding:40px 20px;
+  text-align:center;
+  border-top:1px solid rgba(57,255,141,0.04);
+  color:#cfe9d6;
+  background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent);
+  margin-top:60px;
+}
+.footer-grid{
+  max-width:1100px; margin: 0 auto 14px; display:flex; gap:20px; justify-content:center; flex-wrap:wrap;
+}
+.foot-card{ padding:12px 16px; border-radius:10px; background: rgba(255,255,255,0.02); border:1px solid rgba(57,255,141,0.03);}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width:900px){
+  .nav-inner{ gap:18px; }
+  .nav-brand{ display:none; }
+  .nav-super{ margin: 8px; }
+  .hero{ height:420px; }
+  .section{ padding:48px 16px; }
+}
+/* HAMBURGER - DESNO, VEĆI */
+.hamburger{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-around;
+  width:48px;      /* veće */
+  height:36px;     /* veće */
+  cursor:pointer;
+  margin-left:auto; /* desni rub */
+  z-index:1300;    /* iznad svega */
+}
+.hamburger span{
+  display:block;
+  height:6px;          /* deblje crte */
+  background: var(--accent);
+  border-radius:3px;
+  transition: all 0.3s ease;
+}
+.hamburger.open span:nth-child(1){transform: rotate(45deg) translate(7px,7px);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform: rotate(-45deg) translate(7px,-7px);}
+
+/* SLIDE-DOWN MENU */
+.desktop-menu{
+  position:absolute;      /* klizi preko sadržaja */
+  right:20px;             /* s desnog ruba navbara */
+  top:100%;               /* odmah ispod navbara */
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  overflow:hidden;
+  max-height:0;
+  transition: max-height 0.5s ease, padding 0.5s ease;
+  background: rgba(0,0,0,0.9);
+  padding:0 24px;
+  border-radius:12px;
+}
+.desktop-menu.active{
+  max-height:500px;   /* dovoljno da se svi linkovi pokažu */
+  padding:16px 24px;
+}
+.desktop-menu a{
+  padding:12px 0;
+  color: var(--accent);
+  font-weight:700;
+  text-align:right;
+  text-decoration:none;
+  font-size:1.05rem;
+  transition: transform 0.2s ease;
+}
+.desktop-menu a:hover{
+  transform: translateX(-6px);
+}
+
+</style>
+</head>
+<body>
+
+<!-- Neon grid and page border -->
+<div class="neon-grid" aria-hidden="true"></div>
+<div class="page-border" aria-hidden="true"></div>
+<div class="page-frame" aria-hidden="true"></div>
+
+<!-- PARTICLE CANVAS (particle rain) -->
+<canvas id="particle-canvas"></canvas>
+
+<header>
+  <img id="logo" src="https://i.postimg.cc/mhx8fXTv/Chat-GPT-Image-Dec-2-2025-04-09-29-PM.png" alt="logo">
+  <h1 style="margin:6px 0 0;font-size:1.25rem;font-weight:800;color:var(--accent)">3D Print Studio</h1>
+  <p style="margin:6px 0 0;color:#bfe7c9;font-weight:600">Profesionalno 3D printanje • Ekološki pristup • Premium kvaliteta</p>
+</header>
+
+<!-- NAVIGATION (premium) -->
+<nav class="nav-super" id="topnav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <img src="https://i.postimg.cc/mhx8fXTv/Chat-GPT-Image-Dec-2-2025-04-09-29-PM.png" alt="brand">
+      <div class="name">3D Print</div>
+    </div>
+
+    <!-- Hamburger for desktop and mobile -->
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <span class="nav-underline" id="nav-underline"></span>
+    <div class="nav-accent" aria-hidden="true"></div>
+  </div>
+
+  <!-- Slide-down menu -->
+  <div class="desktop-menu" id="desktopMenu">
+    <a href="printer.html">3D Printer</a>
+    <a href="materijali.html">Materijali</a>
+    <a href="usporedba.html">PLA vs PETG</a>
+    <a href="kontakt.html">Kontakt</a>
+    <a href="narudzbe.html">Narudžba</a>
+  </div>
+</nav>
+
+
+<!-- HERO: Parallax + particles + CTA -->
+<section class="hero" id="hero">
+  <div class="bg-layer" id="heroBg"></div>
+  <div class="overlay"></div>
+
+  <div style="position:relative; z-index:4; max-width:1100px; padding: 0 20px;">
+    <h2>Napredna 3D Tehnologija • Zeleno Printanje</h2>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:18px;">
+      <button class="cta" onclick="scrollToSection('.section')">Saznaj Više</button>
+      <button class="cta" onclick="openContact()" style="opacity:0.95">Kontakt</button>
+    </div>
+  </div>
+
+  <!-- hero particles (decor) -->
+  <div class="particle" style="left:18%; top:20%; width:8px; height:8px; opacity:0.9;"></div>
+  <div class="particle" style="left:72%; top:35%; width:12px; height:12px; opacity:0.6;"></div>
+  <div class="particle" style="left:50%; top:68%; width:6px; height:6px; opacity:0.7;"></div>
+</section>
+
+<!-- CONTENT -->
+<main>
+  <section class="section reveal">
+    <h2>O Nama</h2>
+    <div class="card tilt">
+      <ul>
+        <li>💡 Profesionalni studio gdje ideje postaju stvarnost.</li>
+        <li>🎯 Individualni pristup i prilagođeni proizvodi.</li>
+        <li>🌱 Ekološki materijali i održivo printanje.</li>
+        <li>🔧 Kontrola kvalitete i završna obrada.</li>
+        <li>🎨 Tehnički i umjetnički modeli visoke preciznosti.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <h2>Naša Misija</h2>
+    <div class="card tilt">
+      <ul>
+        <li>💡 Inovativna, dugotrajna i estetski kvalitetna rješenja.</li>
+        <li>🎓 Edukacija o materijalima i optimalnom printanju.</li>
+        <li>⚙️ Najnovija tehnologija i profesionalan softver.</li>
+        <li>🌟 Funkcionalni proizvodi za svaku primjenu.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <h2>Zašto Odabrati Nas?</h2>
+    <div class="card tilt">
+      <ul>
+        <li>💨 Brzo i precizno printanje.</li>
+        <li>🌱 Ekološki PLA i PETG materijali.</li>
+        <li>🎨 Personalizirani modeli visoke složenosti.</li>
+        <li>🛠 Bambu Lab P2S Combo tehnologija.</li>
+        <li>📦 Brza dostava.</li>
+        <li>💡 Savjetovanje i podrška.</li>
+        <li>🔧 Testiranje modela prije isporuke.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="foot-card">📞 +385 91 123 4567</div>
+    <div class="foot-card">✉️ lukacvet1208@gmail.com</div>
+    <div class="foot-card">📍 Koprivnica, Hrvatska</div>
+  </div>
+  <div style="opacity:0.85">© 2025 3D Print Studio — Sva prava pridržana.</div>
+</footer>
+
+<!-- PAGE FRAME ELEMENTS (for z-index) -->
+<div style="position:fixed; inset:0; pointer-events:none; z-index:1900;"></div>
+
+<script>
+/* ---------- UTIL ---------- */
+function scrollToSection(sel){
+  const el = document.querySelector(sel);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+function openContact(){ window.location.href = 'kontakt.html'; }
+
+/* ---------- NAV UNDERLINE + MAGNETIC HOVER ---------- */
+const nav = document.querySelector('.nav-super');
+const links = document.querySelectorAll('.nav-super a');
+const underline = document.getElementById('nav-underline');
+const navInner = document.querySelector('.nav-inner');
+
+links.forEach(link=>{
+  link.addEventListener('mouseenter', (e)=>{
+    const rect = e.target.getBoundingClientRect();
+    const parentRect = navInner.getBoundingClientRect();
+    underline.style.width = rect.width + 'px';
+    underline.style.left = (rect.left - parentRect.left) + 'px';
+  });
+});
+
+/* reset on leave */
+nav.addEventListener('mouseleave', ()=>{
+  underline.style.width = '0';
+});
+
+/* magnetic cursor effect - subtle */
+document.addEventListener('mousemove', (e) => {
+  links.forEach(link=>{
+    const r = link.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width/2);
+    const dy = e.clientY - (r.top + r.height/2);
+    const dist = Math.hypot(dx, dy);
+    const max = 120; // influence radius
+    if(dist < max){
+      const strength = (1 - dist/max) * 10; // px
+      link.style.transform = `translate(${dx/dist * strength || 0}px, ${dy/dist * strength || 0}px)`;
+    } else {
+      link.style.transform = `translate(0,0)`;
+    }
+  });
+});
+
+/* ---------- SHRINK NAVBAR ON SCROLL ---------- */
+let lastScroll = window.scrollY;
+window.addEventListener('scroll', ()=>{
+  const y = window.scrollY;
+  if(y > 40){
+    nav.classList.add('shrink');
+  } else {
+    nav.classList.remove('shrink');
+  }
+  lastScroll = y;
+});
+
+/* ---------- HERO PARALLAX (mouse + scroll) ---------- */
+const heroBg = document.getElementById('heroBg');
+const hero = document.getElementById('hero');
+window.addEventListener('mousemove',(e)=>{
+  const rect = hero.getBoundingClientRect();
+  const relX = (e.clientX - rect.left) / rect.width - 0.5;
+  const relY = (e.clientY - rect.top) / rect.height - 0.5;
+  heroBg.style.transform = `translate3d(${relX*8}px, ${relY*6}px, 0) scale(1.02)`;
+});
+window.addEventListener('scroll', ()=>{
+  const sc = window.scrollY;
+  const offset = Math.min(120, sc/4);
+  heroBg.style.transform = `translate3d(0, ${offset}px, 0) scale(1.02)`;
+});
+
+/* ---------- PARTICLE RAIN (canvas) ---------- */
+(function(){
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let W = canvas.width = innerWidth;
+  let H = canvas.height = innerHeight;
+  const num = Math.round((W*H)/90000); // scale to viewport
+  const particles = [];
+
+  function rand(min,max){ return Math.random()*(max-min)+min; }
+
+  function init(){
+    particles.length = 0;
+    for(let i=0;i<num;i++){
+      particles.push({
+        x: rand(0,W),
+        y: rand(-H, H),
+        vx: rand(-0.2,0.2),
+        vy: rand(0.8, 2.4),
+        size: rand(1,3),
+        life: rand(8,20),
+        hue: 140 + Math.random()*30
+      });
+    }
+  }
+
+  function resize(){
+    W = canvas.width = innerWidth;
+    H = canvas.height = innerHeight;
+    init();
+  }
+  addEventListener('resize', resize);
+
+  function step(){
+    ctx.clearRect(0,0,W,H);
+    for(let p of particles){
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vx += Math.sin((p.y+p.x)/1200) * 0.002;
+      // draw
+      const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*8);
+      const alpha = Math.max(0, 1 - (p.y/H));
+      g.addColorStop(0, `rgba(57,255,141,${0.95*alpha})`);
+      g.addColorStop(0.6, `rgba(0,255,160,${0.25*alpha})`);
+      g.addColorStop(1, `rgba(0,0,0,0)`);
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size*2.6, 0, Math.PI*2);
+      ctx.fill();
+
+      // reset if out
+      if(p.y > H + 20 || p.x < -40 || p.x > W+40){
+        p.x = rand(0,W);
+        p.y = rand(-60, -20);
+        p.vx = rand(-0.2, 0.2);
+        p.vy = rand(0.8, 2.4);
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  resize();
+  step();
+})();
+
+/* ---------- SCROLL REVEAL (IntersectionObserver) ---------- */
+const reveals = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) {
+      e.target.classList.add('show');
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:0.12});
+reveals.forEach(r=>io.observe(r));
+
+/* ---------- 3D TILT EFFECT for .tilt cards ---------- */
+function setupTilt(){
+  const tilts = document.querySelectorAll('.tilt');
+  tilts.forEach(el=>{
+    el.addEventListener('mousemove', (ev)=>{
+      const r = el.getBoundingClientRect();
+      const px = (ev.clientX - r.left) / r.width;
+      const py = (ev.clientY - r.top) / r.height;
+      const rx = (py - 0.5) * 8;
+      const ry = (px - 0.5) * -12;
+      el.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px)`;
+      el.style.boxShadow = `0 18px 40px rgba(2,5,4,0.6), 0 0 30px rgba(57,255,141,0.03)`;
+    });
+    el.addEventListener('mouseleave', ()=>{
+      el.style.transform = '';
+      el.style.boxShadow = '';
+    });
+  });
+}
+setupTilt();
+
+/* ---------- optional: replace hero image with AI generated (commented) ---------- */
+/*
+fetch('URL_TO_AI_IMAGE.jpg').then(r=>r.blob()).then(b=>{
+  const url = URL.createObjectURL(b);
+  document.getElementById('heroBg').style.backgroundImage = `url(${url})`;
+});
+*/
+
+/* Ensure nav underline positions correctly on load (if hovered by default) */
+window.addEventListener('load', ()=>{ underline.style.transition = 'width 260ms, left 260ms'; });
+const hamburger = document.getElementById('hamburger');
+const desktopMenu = document.getElementById('desktopMenu');
+
+hamburger.addEventListener('click', ()=>{
+  hamburger.classList.toggle('open');
+  desktopMenu.classList.toggle('active');
+});
+
+</script>
+</body>
+</html>
